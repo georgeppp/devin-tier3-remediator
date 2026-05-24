@@ -8,3 +8,6 @@ venv/
 .mypy_cache/
 *.egg-info/
 .DS_Store
+# Runtime logs from the host-mode launch (uvicorn, smee, poller, dashboard)
+.*.log
+.test.db

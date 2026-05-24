@@ -1,0 +1,32 @@
+[
+  {
+    "title": "[Security] Add authorization check on dataset ownership transfer endpoint",
+    "labels": ["devin-auto", "security-fix"],
+    "body": "## Context\nThe dataset ownership transfer flow in Superset's REST API currently lets any authenticated user with edit access modify the `owners` field on a dataset, but does not verify that the caller is themselves an owner or an Admin before allowing the transfer. This breaks the principle of least privilege and could let a low-privilege Alpha user reassign datasets away from their rightful owners.\n\n## Acceptance criteria\n- [ ] `SupersetSecurityManager` (or the dataset PUT handler) rejects ownership-transfer requests from users who are neither current owners nor Admin with a 403\n- [ ] A unit test covers both the allowed (owner/Admin) and denied (non-owner Alpha) cases\n- [ ] All tests pass: `pytest tests/unit_tests/`\n- [ ] Pre-commit passes: `pre-commit run --all-files`\n\n## Out of scope\n- No unrelated refactors\n- No formatting changes outside touched files\n\n## Relevant files\n- superset/datasets/api.py\n- superset/datasets/commands/update.py\n- superset/security/manager.py\n- tests/unit_tests/datasets/api_tests.py"
+  },
+  {
+    "title": "[Deps] Bump urllib3 from 2.5.0 to 2.6.0 (CVE-2025-66471)",
+    "labels": ["devin-auto", "dep-upgrade"],
+    "body": "## Context\nOur pinned `urllib3==2.5.0` is reported to be affected by CVE-2025-66471, which is the stated motivation for this bump. Upgrading to `2.6.0` is the minimal patch release that addresses it and should be a drop-in change for Superset's HTTP client usage.\n\n## Acceptance criteria\n- [ ] `urllib3` pin is updated from `2.5.0` to `2.6.0` in the relevant requirements file(s)\n- [ ] Any lockfile / compiled requirements regenerated consistently so the version is `2.6.0` everywhere it appears\n- [ ] All tests pass: `pytest tests/unit_tests/`\n- [ ] Pre-commit passes: `pre-commit run --all-files`\n\n## Out of scope\n- No unrelated refactors\n- No formatting changes outside touched files\n\n## Relevant files\n- requirements/base.txt\n- requirements/development.txt\n- setup.py"
+  },
+  {
+    "title": "[Deps] Bump js-yaml 3.14.1 → 3.14.2 (prototype pollution)",
+    "labels": ["devin-auto", "dep-upgrade"],
+    "body": "## Context\nA transitive (or direct) `js-yaml@3.14.1` in `superset-frontend` is flagged by `npm audit` for a prototype pollution issue fixed in `3.14.2`. Bumping the pin (and refreshing the lockfile) clears the advisory without any API change.\n\n## Acceptance criteria\n- [ ] `js-yaml` is pinned to `3.14.2` (or an `overrides`/`resolutions` entry forces transitive copies to `3.14.2`) in `superset-frontend/package.json`\n- [ ] `superset-frontend/package-lock.json` regenerated so no `3.14.1` copy remains\n- [ ] All tests pass: `cd superset-frontend && npm test`\n- [ ] Pre-commit passes: `pre-commit run --all-files`\n\n## Out of scope\n- No unrelated refactors\n- No formatting changes outside touched files\n\n## Relevant files\n- superset-frontend/package.json\n- superset-frontend/package-lock.json"
+  },
+  {
+    "title": "[Migration] Convert superset-frontend/src/utils/getClientErrorObject.js to TypeScript",
+    "labels": ["devin-auto", "js-to-ts"],
+    "body": "## Context\n`superset-frontend/src/utils/getClientErrorObject.js` is one of the remaining plain-JS utilities in an otherwise TypeScript-heavy frontend. Converting it gives us proper types on a function that is imported widely across the codebase for normalizing API/network error responses.\n\n## Acceptance criteria\n- [ ] File renamed from `getClientErrorObject.js` to `getClientErrorObject.ts` with explicit parameter and return types (no implicit `any`)\n- [ ] All existing import sites continue to resolve without path changes (extension is inferred)\n- [ ] All tests pass: `cd superset-frontend && npm test`\n- [ ] Type check passes: `cd superset-frontend && npm run type`\n- [ ] Pre-commit passes: `pre-commit run --all-files`\n\n## Out of scope\n- No unrelated refactors\n- No formatting changes outside touched files\n\n## Relevant files\n- superset-frontend/src/utils/getClientErrorObject.js\n- superset-frontend/src/utils/getClientErrorObject.test.ts"
+  },
+  {
+    "title": "[Lint] Fix mypy errors in superset/charts/api.py",
+    "labels": ["devin-auto", "lint-debt"],
+    "body": "## Context\n`superset/charts/api.py` currently emits mypy errors due to several public handler methods missing return-type annotations and a couple of untyped decorators on the class methods. These show up as noise in CI lint output and block tightening the project-wide mypy config.\n\n## Acceptance criteria\n- [ ] All public methods in `superset/charts/api.py` have explicit return type annotations (e.g. `-> Response`)\n- [ ] Any `# type: ignore` added is narrowly scoped with an error code, not a blanket ignore\n- [ ] `mypy superset/charts/api.py` reports zero errors\n- [ ] All tests pass: `pytest tests/unit_tests/`\n- [ ] Pre-commit passes: `pre-commit run --all-files`\n\n## Out of scope\n- No unrelated refactors\n- No formatting changes outside touched files\n\n## Relevant files\n- superset/charts/api.py\n- superset/charts/schemas.py"
+  },
+  {
+    "title": "[Docs] Update outdated dev setup commands in CONTRIBUTING.md",
+    "labels": ["devin-auto", "doc-drift"],
+    "body": "## Context\nThe local development section of `CONTRIBUTING.md` still references `docker-compose` (the legacy v1 standalone binary) for spinning up the dev stack, while the project has moved to the `docker compose` (v2 plugin) subcommand. New contributors following the doc on a fresh machine hit `command not found` errors.\n\n## Acceptance criteria\n- [ ] All `docker-compose ...` invocations in `CONTRIBUTING.md` are updated to `docker compose ...`\n- [ ] Any adjacent stale references (e.g. a Python version that no longer matches `setup.py` / `pyproject.toml`) are corrected in the same section\n- [ ] All tests pass: `pytest tests/unit_tests/`\n- [ ] Pre-commit passes: `pre-commit run --all-files`\n\n## Out of scope\n- No unrelated refactors\n- No formatting changes outside touched files\n\n## Relevant files\n- CONTRIBUTING.md"
+  }
+]

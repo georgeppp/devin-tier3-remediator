@@ -23,10 +23,15 @@ def _org_url(suffix: str) -> str:
 
 
 def create_session(prompt: str, idempotency_key: str, tags: list[str], title: str | None = None):
+    """Create a Devin session.
+
+    `idempotency_key` is accepted only for API symmetry with the orchestrator
+    layer; the v3 API does NOT support server-side request dedup. We tag the
+    session with it so the issue can still be correlated from the Devin UI.
+    """
     payload: dict = {
         "prompt": prompt,
-        "idempotency_key": idempotency_key,
-        "tags": tags,
+        "tags": list(tags) + [f"idem:{idempotency_key}"],
     }
     if title:
         payload["title"] = title
