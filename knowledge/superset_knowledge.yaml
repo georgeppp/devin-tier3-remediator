@@ -1,0 +1,29 @@
+- name: superset-test-commands
+  trigger: When running or verifying tests in apache/superset
+  body: |
+    Python: pytest tests/unit_tests/
+    Frontend: cd superset-frontend && npm test
+    Before declaring done, always run pre-commit run --all-files.
+
+- name: superset-branch-conventions
+  trigger: When creating a branch or PR for apache/superset
+  body: |
+    Branch: devin/<issue-number>-<slug>
+    PR title prefix matches issue label: [Security], [Deps], [Migration], [Lint], [Docs]
+    Never push to master.
+
+- name: superset-security-conventions
+  trigger: When fixing security vulnerabilities in apache/superset
+  body: |
+    Authorization logic: superset/security/manager.py
+    API decorators: superset/views/base_api.py
+    Security tests: tests/unit_tests/security/
+    Always add a regression test that fails on pre-fix code.
+
+- name: superset-dep-upgrade-protocol
+  trigger: When upgrading a Python or npm dependency in apache/superset
+  body: |
+    Python deps: requirements/*.txt
+    JS deps: superset-frontend/package.json
+    Check UPDATING.md and upstream changelog for breaking changes before upgrading.
+    Run full test suite after.
